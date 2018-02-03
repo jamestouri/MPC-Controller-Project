@@ -98,7 +98,7 @@ int main() {
           * Both are in between [-1, 1].
           *
           */
-            double steer_value = -vars[6]/0.436332;
+            double steer_value = vars[6]/0.436332;
             double throttle_value = vars[7];
 
           json msgJson;
