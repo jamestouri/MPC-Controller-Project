@@ -91,15 +91,27 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
+            
+            int num_points = ptsx.size();
+            Eigen::VectorXd eigen_next_x(num_points);
+            Eigen::VectorXd eigen_next_y(num_points);
 
-          /*
-          * TODO: Calculate steering angle and throttle using MPC.
-          *
-          * Both are in between [-1, 1].
-          *
-          */
-            double steer_value = vars[6]/0.436332;
-            double throttle_value = vars[7];
+            for (auto i=0; i < num_points; ++i){
+                eigen_next_x(i) = cos(-psi) * (ptsx[i] - px) - sin(-psi) * (ptsy[i] - py);
+                eigen_next_y(i) = sin(-psi) * (ptsx[i] - px) + cos(-psi) * (ptsy[i] - py);
+            }
+            
+            auto coeffs = polyfit(eigen_next_x, eigen_next_y, 3);
+            double cte = polyeval(coeffs, 0);
+            double epsi = -atan(coeffs[1]);
+            
+            Eigen::VectorXd state(6);
+            state << 0, 0, 0, v, cte, epsi;
+            
+            vector<double> vars = mpc.Solve(state,coeffs);
+          
+            double steer_value = vars[0];
+            double throttle_value = vars[1];
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
