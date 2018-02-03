@@ -161,11 +161,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   Dvector vars_upperbound(n_vars);
   // TODO: Set lower and upper limits for variables.
 
-  // Lower and upper limits for the constraints
-  // Should be 0 besides initial state.
-  Dvector constraints_lowerbound(n_constraints);
-  Dvector constraints_upperbound(n_constraints);
-    
+
   for (int i = 0; i < n_constraints; i++) {
     constraints_lowerbound[i] = -1.0e3;
     constraints_upperbound[i] = 1.0e3;
@@ -188,6 +184,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     // Lower and upper limits for constraints
     // All of these should be 0 except the initial
     // state indices.
+    Dvector constraints_lowerbound(n_constraints);
     Dvector constraints_upperbound(n_constraints);
     for (int i = 0; i < n_constraints; i++) {
         constraints_lowerbound[i] = 0;
