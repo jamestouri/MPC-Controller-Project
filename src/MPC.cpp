@@ -21,9 +21,6 @@ double dt = 0.05;
 double ref_cte = 0;
 double ref_epsi = 0;
 
-// reference velocity
-double ref_v = 50;
-
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
 
@@ -191,7 +188,6 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     // Lower and upper limits for constraints
     // All of these should be 0 except the initial
     // state indices.
-    Dvector constraints_lowerbound(n_constraints);
     Dvector constraints_upperbound(n_constraints);
     for (int i = 0; i < n_constraints; i++) {
         constraints_lowerbound[i] = 0;
