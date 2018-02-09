@@ -162,11 +162,11 @@ int main() {
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
             
-            int points_size = (vars.size() - 2) / 2;
-            for (int i = 0; i < points_size; i++) {
-                mpc_x_vals.push_back(vars[2 * i + 2]);
-                mpc_y_vals.push_back(vars[2 * i + 2 + 1]);
-            }
+//            int points_size = (vars.size() - 2) / 2;
+//            for (int i = 0; i < points_size; i++) {
+//                mpc_x_vals.push_back(vars[2 * i + 2]);
+//                mpc_y_vals.push_back(vars[2 * i + 2 + 1]);
+//            }
           
 
 
@@ -186,12 +186,12 @@ int main() {
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
             
-            double d = 2.5;
-            int num = 25;
-            for (int i=0; i<num; i++) {
-                next_x_vals.push_back(d*i);
-                next_y_vals.push_back(polyeval(coeffs, d*i));
-            };
+//            double d = 2.5;
+//            int num = 25;
+//            for (int i=0; i<num; i++) {
+//                next_x_vals.push_back(d*i);
+//                next_y_vals.push_back(polyeval(coeffs, d*i));
+//            };
 
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
