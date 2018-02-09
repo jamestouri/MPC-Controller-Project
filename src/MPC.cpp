@@ -6,7 +6,7 @@
 using CppAD::AD;
 
 // TODO: Set the timestep length and duration
-size_t N = 25;
+size_t N = 15;
 double dt = 0.05;
 
 // This value assumes the model presented in the classroom is used.
@@ -24,7 +24,7 @@ double ref_epsi = 0;
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
 
-double ref_v = 5;  // ~100 mph
+double ref_v = 12;  // ~100 mph
 
 // index book-keeping for solver vector
 size_t x_start = 0;
