@@ -16,6 +16,7 @@ using json = nlohmann::json;
 constexpr double pi() { return M_PI; }
 double deg2rad(double x) { return x * pi() / 180; }
 double rad2deg(double x) { return x * 180 / pi(); }
+const double Lf = 2.67;
 
 // Checks if the SocketIO event has JSON data.
 // If there is data the JSON object in string format will be returned,
@@ -85,14 +86,17 @@ int main() {
         string event = j[0].get<string>();
         if (event == "telemetry") {
           // j[1] is the data JSON object
-          vector<double> ptsx_car = j[1]["ptsx"];
-          vector<double> ptsy_car = j[1]["ptsy"];
+          vector<double> ptsx = j[1]["ptsx"];
+          vector<double> ptsy = j[1]["ptsy"];
           double px = j[1]["x"];
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
           double steer_angle = j[1]["steering_angle"];
           double throttle =  j[1]["throttle"];
+            
+            vector<double> ptsx_car(ptsx.size());
+            vector<double> ptsy_car(ptsy.size());
             
             for(int i=0; i < ptsx.size();i++)
             {
@@ -145,6 +149,8 @@ int main() {
             double throttle_value = vars[1];
 
           json msgJson;
+            
+            int N = 12
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
           msgJson["steering_angle"] = -steer_value;
