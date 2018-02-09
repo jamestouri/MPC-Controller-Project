@@ -66,6 +66,29 @@ Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals,
   return result;
 }
 
+
+
+vector<vector<double>> BuildGreenLine(Eigen::VectorXd state, std::vector<double> results){
+    std::vector<double> mpc_x_vals = {state[0]};
+    std::vector<double> mpc_y_vals = {state[1]};
+    for (int i = 2; i < results.size(); i+=2) {
+        mpc_x_vals.push_back(results[i]);
+        mpc_y_vals.push_back(results[i+1]);
+    }
+    return {mpc_x_vals,mpc_y_vals};
+}
+
+vector<vector<double>> BuildYellowLine(Eigen::VectorXd coeffs, double x_poly, int length ){
+    std::vector<double> next_x_vals;
+    std::vector<double> next_y_vals;
+    for (int i = 1; i < length; i++) {
+        next_x_vals.push_back(x_poly*i);
+        next_y_vals.push_back(polyeval(coeffs, x_poly * i));
+    }
+    return {next_x_vals, next_y_vals};
+}
+
+
 int main() {
   uWS::Hub h;
 
@@ -155,39 +178,59 @@ int main() {
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
           msgJson["steering_angle"] = -steer_value;
           msgJson["throttle"] = throttle_value;
-
-          //Display the MPC predicted trajectory 
-          vector<double> mpc_x_vals;
-          vector<double> mpc_y_vals;
             
-            for(int i=0; i < N-1; i++ )
-            {
-                mpc_x_vals.push_back(vars[i+2]);
-                mpc_y_vals.push_back(vars[(N-1)+i+2]);
-            }
-
-          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
-          // the points in the simulator are connected by a Green line
-
-          msgJson["mpc_x"] = mpc_x_vals;
-          msgJson["mpc_y"] = mpc_y_vals;
-
-          //Display the waypoints/reference line
-          vector<double> next_x_vals;
-          vector<double> next_y_vals;
-
-          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
-          // the points in the simulator are connected by a Yellow line
-
-          msgJson["next_x"] = next_x_vals;
-          msgJson["next_y"] = next_y_vals;
+            auto grn_trajectory = BuildGreenLine(state, results);
+            auto mpc_x_vals = grn_trajectory[0];
+            auto mpc_y_vals = grn_trajectory[1];
             
-            double d = 2.5;
-            int num = 25;
-            for (int i=0; i<num; i++) {
-                next_x_vals.push_back(d*i);
-                next_y_vals.push_back(polyeval(coeffs, d*i));
-            };
+            
+            msgJson["mpc_x"] = mpc_x_vals;
+            msgJson["mpc_y"] = mpc_y_vals;
+            
+            // Display the waypoints/reference line
+            auto yel_trajectory = BuildYellowLine(coeffs,2.5, 25);
+            auto next_x_vals = yel_trajectory[0];
+            auto next_y_vals = yel_trajectory[1];
+            
+            // add (x,y) points to list here, points are in reference to the vehicle's coordinate system
+            // the points in the simulator are connected by a Yellow line
+            
+            
+            msgJson["next_x"] = next_x_vals;
+            msgJson["next_y"] = next_y_vals;
+
+//          //Display the MPC predicted trajectory
+//          vector<double> mpc_x_vals;
+//          vector<double> mpc_y_vals;
+//
+//            for(int i=0; i < N-1; i++ )
+//            {
+//                mpc_x_vals.push_back(vars[i+2]);
+//                mpc_y_vals.push_back(vars[(N-1)+i+2]);
+//            }
+//
+//          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
+//          // the points in the simulator are connected by a Green line
+//
+//          msgJson["mpc_x"] = mpc_x_vals;
+//          msgJson["mpc_y"] = mpc_y_vals;
+//
+//          //Display the waypoints/reference line
+//          vector<double> next_x_vals;
+//          vector<double> next_y_vals;
+//
+//          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
+//          // the points in the simulator are connected by a Yellow line
+//
+//          msgJson["next_x"] = next_x_vals;
+//          msgJson["next_y"] = next_y_vals;
+//
+//            double d = 2.5;
+//            int num = 25;
+//            for (int i=0; i<num; i++) {
+//                next_x_vals.push_back(d*i);
+//                next_y_vals.push_back(polyeval(coeffs, d*i));
+//            };
 
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
