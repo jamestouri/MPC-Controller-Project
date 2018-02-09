@@ -147,7 +147,7 @@ int main() {
             
             vector<double> vars = mpc.Solve(state,coeffs);
           
-            double steer_value = - vars[0]/ (deg2rad(25));
+            double steer_value = vars[0];
             double throttle_value = vars[1];
 
           json msgJson;
@@ -155,19 +155,19 @@ int main() {
             int N = 12;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-          msgJson["steering_angle"] = steer_value;
+          msgJson["steering_angle"] = -steer_value;
           msgJson["throttle"] = throttle_value;
 
           //Display the MPC predicted trajectory 
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
             
-//            int points_size = (vars.size() - 2) / 2;
-//            for (int i = 0; i < points_size; i++) {
-//                mpc_x_vals.push_back(vars[2 * i + 2]);
-//                mpc_y_vals.push_back(vars[2 * i + 2 + 1]);
-//            }
-//
+            int points_size = (vars.size() - 2) / 2;
+            for (int i = 0; i < points_size; i++) {
+                mpc_x_vals.push_back(vars[2 * i + 2]);
+                mpc_y_vals.push_back(vars[2 * i + 2 + 1]);
+            }
+          
 
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
@@ -186,12 +186,12 @@ int main() {
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
             
-//            double d = 2.5;
-//            int num = 25;
-//            for (int i=0; i<num; i++) {
-//                next_x_vals.push_back(d*i);
-//                next_y_vals.push_back(polyeval(coeffs, d*i));
-//            };
+            double d = 2.5;
+            int num = 25;
+            for (int i=0; i<num; i++) {
+                next_x_vals.push_back(d*i);
+                next_y_vals.push_back(polyeval(coeffs, d*i));
+            };
 
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
