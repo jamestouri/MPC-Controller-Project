@@ -24,7 +24,7 @@ double ref_epsi = 0;
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
 
-double ref_v = 45;  // ~100 mph
+double ref_v = 15;  // ~100 mph
 
 // index book-keeping for solver vector
 size_t x_start = 0;
