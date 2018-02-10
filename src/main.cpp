@@ -147,7 +147,7 @@ int main() {
             
             vector<double> vars = mpc.Solve(state,coeffs);
           
-            double steer_value = vars[0] / deg2rad(25);
+            double steer_value = vars[0];
             double throttle_value = vars[1];
 
           json msgJson;
@@ -161,12 +161,12 @@ int main() {
             //Display the waypoints/reference line
             vector<double> next_x_vals;
             vector<double> next_y_vals;
-            double d = 2.5;
-            int num = 25;
-            for (int i=0; i<num; i++) {
-                next_x_vals.push_back(d*i);
-                next_y_vals.push_back(polyeval(coeffs, d*i));
-            };
+//            double d = 2.5;
+//            int num = 25;
+//            for (int i=0; i<num; i++) {
+//                next_x_vals.push_back(d*i);
+//                next_y_vals.push_back(polyeval(coeffs, d*i));
+//            };
 
           //Display the MPC predicted trajectory 
           vector<double> mpc_x_vals;
