@@ -24,7 +24,7 @@ double ref_epsi = 0;
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
 
-double ref_v = 20;  // ~100 mph
+double ref_v = 25;  // ~100 mph
 
 // index book-keeping for solver vector
 size_t x_start = 0;
@@ -53,7 +53,7 @@ class FG_eval {
       //CTE Orientation error
         // CTE, orientation error and ref-speed error
         for (int i = 0; i < N; i++) {
-            fg[0] += 0.05 * CppAD::pow(vars[cte_start + i] - ref_cte, 2);
+            fg[0] += CppAD::pow(vars[cte_start + i] - ref_cte, 2);
             fg[0] += CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
             fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
         }
@@ -66,7 +66,7 @@ class FG_eval {
         
         // Minimize the value gap between sequential actuations.
         for (int i = 0; i < N - 2; i++) {
-            fg[0] += CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
+            fg[0] += 5000 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
             fg[0] += CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
         }
         
@@ -247,9 +247,6 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     result.push_back(solution.x[a_start]);
     for (int i=0; i <N-1; i++) {
         result.push_back(solution.x[i + x_start + 1]);
-    }
-    
-    for (int i=0; i <N-1; i++) {
         result.push_back(solution.x[i + y_start + 1]);
     }
   //
