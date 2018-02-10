@@ -174,9 +174,9 @@ int main() {
             
             for (int i = 2; i < vars.size(); i++) {
                 if (i % 2 == 0) {
-                    mpc_x_pred.push_back(vars[i]);
+                    mpc_x_vals.push_back(vars[i]);
                 } else {
-                    mpc_y_pred.push_back(vars[i]);
+                    mpc_y_vals.push_back(vars[i]);
                 }
             }
 
