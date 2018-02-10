@@ -105,8 +105,8 @@ int main() {
                 double x = ptsx[i] - px;
                 double y = ptsy[i] -py;
                 
-                ptsx_car[i] = x * cos(-psi) - y * sin(-psi);
-                ptsy_car[i] = x * sin(-psi) + y * cos(-psi);
+                ptsx_car[i] = x * cos(-psi) + y * sin(-psi);
+                ptsy_car[i] = x * sin(-psi) - y * cos(-psi);
                 
             }
 
@@ -120,7 +120,7 @@ int main() {
             Eigen::VectorXd state(6);
             double x0 = 0;
             double y0 = 0;
-            double dt = 0.1;
+            double dt = 0;
             double v0 = v*0.44704;
             double a0 = throttle;
             
@@ -152,10 +152,9 @@ int main() {
 
           json msgJson;
             
-            int N = 12;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-          msgJson["steering_angle"] = -steer_value;
+          msgJson["steering_angle"] = -steer_value/deg2rad(25);
           msgJson["throttle"] = throttle_value;
             
             //Display the waypoints/reference line
@@ -172,6 +171,14 @@ int main() {
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
             
+            for (int i = 2; i < vars.size(); i++) {
+                if (i % 2 == 0) {
+                    mpc_x_vals.push_back(vars[i]);
+                } else {
+                    mpc_y_vals.push_back(vars[i]);
+                }
+            }
+
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
