@@ -110,14 +110,13 @@ int main() {
             }
             
             auto coeffs = polyfit(ptsx_car, ptsy_car, 3);
-            double cte  = polyeval(coeffs, 0); //In car coordinates, car is always at (0,0)
-            double epsi = -atan((double)coeffs[1]); //Car is at (0,0) so simplifies equation
-            //+ 2 * coeffs[2] * px + 3 * coeffs[3] * pow(px, 2)) );
-            
+            double cte  = polyeval(coeffs, 0);
+            double epsi = -atan((double)coeffs[1]);
+
      
             
             Eigen::VectorXd state(6);
-            state << 0, 0, 0, v, cte, epsi;
+            state << 0, 0, 0.1, v, cte, epsi;
             auto vars = mpc.Solve(state, coeffs);
             steer_value = -vars[0];
             throttle_value = vars[1];
@@ -142,7 +141,7 @@ int main() {
                     mpc_y_vals.push_back(vars[i]);
                 }
             }
-            
+            // Green Lines
             msgJson["mpc_x"] = mpc_x_vals;
             msgJson["mpc_y"] = mpc_y_vals;
             
@@ -156,7 +155,7 @@ int main() {
                 next_x_vals.push_back(i);
                 next_y_vals.push_back(polyeval(coeffs, i));
             }
-            
+            //Yello
             msgJson["next_x"] = next_x_vals;
             msgJson["next_y"] = next_y_vals;
             
