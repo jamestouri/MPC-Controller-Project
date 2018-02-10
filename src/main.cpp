@@ -96,9 +96,9 @@ int main() {
           double v = j[1]["speed"];
           double steer_angle = j[1]["steering_angle"];
           double throttle =  j[1]["throttle"];
-            
-            vector<double> ptsx_car(ptsx.size());
-            vector<double> ptsy_car(ptsy.size());
+           
+            Eigen::VectorXd ptsx_car(ptsx.size());
+            Eigen::VectorXd ptsy_car(ptsy.size());
             
             for(int i=0; i < ptsx.size();i++)
             {
