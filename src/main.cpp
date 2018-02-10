@@ -105,57 +105,41 @@ int main() {
                 double x = ptsx[i] - px;
                 double y = ptsy[i] -py;
                 
-                ptsx_car[i] = x * cos(-psi) + y * sin(-psi);
-                ptsy_car[i] = x * sin(-psi) - y * cos(-psi);
+                ptsx_car[i] = x * cos(psi) + y * sin(psi);
+                ptsy_car[i] = -x * sin(-psi) + y * cos(psi);
                 
             }
 
-            Eigen::VectorXd ptsxv = Eigen::VectorXd::Map(ptsx_car.data(), ptsx.size());
-            Eigen::VectorXd ptsyv = Eigen::VectorXd::Map(ptsy_car.data(), ptsy.size());
 
             auto coeffs = polyfit(ptsxv, ptsyv, 3);
             double cte = polyeval(coeffs, 0);
-            double epsi = -atan(coeffs[1]);
+            double epsi = -atan((double)coeffs[1]);
+    
             
             Eigen::VectorXd state(6);
-            double x0 = 0;
-            double y0 = 0;
-            double dt = 0;
-            double v0 = v*0.44704;
-            double a0 = throttle;
-            
-            double psi0 = 0;
-            double delta1 = steer_angle;
-            double epsi0 =epsi;
-            
-            
-            double v1 =  (v0 + a0 * dt);
-            double psi1 = (psi0 + v0 * delta1 / Lf * dt);
-            
-            double x1 = (x0 + v0 * cos(psi0) * dt);
-            double y1 = (y0 + v0 * sin(psi0) * dt);
-            
-            double f1 = coeffs[0] + coeffs[1] * x1 + coeffs[2]*x1 * x1 + coeffs[3] * x1 * x1 * x1;
-            
-            double psides1 = atan(coeffs[1] + (2*coeffs[2] * x1) + (3*coeffs[3] * x1 *x1));
-            
-            double cte1 = ((f1 - x1) + (v1 * sin(psi1) * dt));
-            double epsi1 = ((psi1 - psides1) + v1 * delta1 / Lf * dt);
-            
-            
-            state << x1, y1, psi1, v1, cte1, epsi1;
-            
-            vector<double> vars = mpc.Solve(state,coeffs);
-          
-            double steer_value = vars[0];
-            double throttle_value = vars[1];
+            state << 0, 0, 0, v, cte, epsi;
+            auto vars = mpc.Solve(state, coeffs);
+            steer_value = -vars[0];
+            throttle_value = vars[1];
 
           json msgJson;
             
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-          msgJson["steering_angle"] = -steer_value;
+          msgJson["steering_angle"] = -steer_value/deg2rad(25);
           msgJson["throttle"] = throttle_value;
+            
+            //Display the MPC predicted trajectory
+            vector<double> mpc_x_vals;
+            vector<double> mpc_y_vals;
+            
+            for (int i = 2; i < vars.size(); i++) {
+                if (i % 2 == 0) {
+                    mpc_x_vals.push_back(vars[i]);
+                } else {
+                    mpc_y_vals.push_back(vars[i]);
+                }
+            }
             
             //Display the waypoints/reference line
             vector<double> next_x_vals;
@@ -167,22 +151,13 @@ int main() {
                 next_y_vals.push_back(polyeval(coeffs, d*i));
             };
 
-          //Display the MPC predicted trajectory 
-          vector<double> mpc_x_vals;
-          vector<double> mpc_y_vals;
-            
-            for (int i = 2; i < vars.size(); i++) {
-                if (i % 2 == 0) {
-                    mpc_x_vals.push_back(vars[i]);
-                } else {
-                    mpc_y_vals.push_back(vars[i]);
-                }
-            }
-
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
 
+
+            msgJson["mpc_x"] = mpc_x_vals;
+            msgJson["mpc_y"] = mpc_y_vals;
 
         
 
@@ -193,9 +168,6 @@ int main() {
           msgJson["next_y"] = next_y_vals;
             
           
-
-            msgJson["mpc_x"] = mpc_x_vals;
-            msgJson["mpc_y"] = mpc_y_vals;
 
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
