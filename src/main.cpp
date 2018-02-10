@@ -111,7 +111,7 @@ int main() {
             }
 
 
-            auto coeffs = polyfit(ptsxv, ptsyv, 3);
+            auto coeffs = polyfit(ptsx_car, ptsy_car, 3);
             double cte = polyeval(coeffs, 0);
             double epsi = -atan((double)coeffs[1]);
     
@@ -119,15 +119,15 @@ int main() {
             Eigen::VectorXd state(6);
             state << 0, 0, 0, v, cte, epsi;
             auto vars = mpc.Solve(state, coeffs);
-            steer_value = -vars[0];
-            throttle_value = vars[1];
+            steer_angle = -vars[0];
+            throttle = vars[1];
 
           json msgJson;
             
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-          msgJson["steering_angle"] = -steer_value/deg2rad(25);
-          msgJson["throttle"] = throttle_value;
+          msgJson["steering_angle"] = -steer_angle/deg2rad(25);
+          msgJson["throttle"] = throttle;
             
             //Display the MPC predicted trajectory
             vector<double> mpc_x_vals;
