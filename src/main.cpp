@@ -157,39 +157,47 @@ int main() {
           msgJson["steering_angle"] = -steer_value/deg2rad(25);
           msgJson["throttle"] = throttle_value;
             
- 
-          //Display the MPC predicted trajectory 
-            vector<double> mpc_x_vals;
-            vector<double> mpc_y_vals;
-            
-            //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
-            // the points in the simulator are connected by a Green line
-            for (int i = 2; i < vars.size(); i ++) {
-                if (i%2 == 0) {
-                    mpc_x_vals.push_back(vars[i]);
-                }
-                else {
-                    mpc_y_vals.push_back(vars[i]);
-                }
-            }
-            
-            msgJson["mpc_x"] = mpc_x_vals;
-            msgJson["mpc_y"] = mpc_y_vals;
-
             //Display the waypoints/reference line
             vector<double> next_x_vals;
             vector<double> next_y_vals;
+            double d = 2.5;
+            int num = 25;
+            for (int i=0; i<num; i++) {
+                next_x_vals.push_back(d*i);
+                next_y_vals.push_back(polyeval(coeffs, d*i));
+            };
+
+          //Display the MPC predicted trajectory 
+          vector<double> mpc_x_vals;
+          vector<double> mpc_y_vals;
             
-            //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
-            // the points in the simulator are connected by a Yellow line
-            for (double i = 0; i < 25; i += 3){
-                next_x_vals.push_back(i);
-                next_y_vals.push_back(polyeval(coeffs, i));
+            for (int i = 2; i < vars.size(); i++) {
+                if (i % 2 == 0) {
+                    mpc_x_vals.push_back(vars[i]);
+                } else {
+                    mpc_y_vals.push_back(vars[i]);
+                }
             }
+
+
+          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
+          // the points in the simulator are connected by a Green line
+
+
+        
+
+          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
+          // the points in the simulator are connected by a Yellow line
+
+          msgJson["next_x"] = next_x_vals;
+          msgJson["next_y"] = next_y_vals;
             
-            msgJson["next_x"] = next_x_vals;
-            msgJson["next_y"] = next_y_vals;
-            
+          
+
+            msgJson["mpc_x"] = mpc_x_vals;
+            msgJson["mpc_y"] = mpc_y_vals;
+
+
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           // Latency
