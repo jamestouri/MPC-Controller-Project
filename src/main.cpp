@@ -94,34 +94,33 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
-          double steer_angle = j[1]["steering_angle"];
-          double throttle =  j[1]["throttle"];
+          double steer_value = j[1]["steering_angle"];
+          double throttle_value = j[1]["throttle"];
             
             // Check Check
            
-            Eigen::VectorXd ptsx_eig(ptsx.size());
-            Eigen::VectorXd ptsy_eig(ptsy.size());
+            Eigen::VectorXd ptsx_car(ptsx.size());
+            Eigen::VectorXd ptsy_car(ptsy.size());
             
             for (int i = 0; i < ptsx.size(); i++) {
                 double rel_x = ptsx[i] - px;
                 double rel_y = ptsy[i] - py;
-                ptsx_eig(i) = rel_x * cos(psi) + rel_y * sin(psi);
-                ptsy_eig(i) = -rel_x * sin(psi) + rel_y * cos(psi);
+                ptsx_car(i) = rel_x * cos(psi) + rel_y * sin(psi);
+                ptsy_car(i) = -rel_x * sin(psi) + rel_y * cos(psi);
             }
             
-            auto coeffs = polyfit(ptsx_eig, ptsy_eig, 3);
+            auto coeffs = polyfit(ptsx_car, ptsy_car, 3);
             double cte  = polyeval(coeffs, 0); //In car coordinates, car is always at (0,0)
             double epsi = -atan((double)coeffs[1]); //Car is at (0,0) so simplifies equation
             //+ 2 * coeffs[2] * px + 3 * coeffs[3] * pow(px, 2)) );
             
-            double steer_value    = j[1]["steering_angle"];
-            double throttle_value = j[1]["throttle"];
+     
             
             Eigen::VectorXd state(6);
             state << 0, 0, 0, v, cte, epsi;
-            auto vars     = mpc.Solve(state, coeffs);
-            steer_value   = -vars[0];
-            throttle_value= vars[1];
+            auto vars = mpc.Solve(state, coeffs);
+            steer_value = -vars[0];
+            throttle_value = vars[1];
             
             json msgJson;
             // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
@@ -136,7 +135,7 @@ int main() {
             //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
             // the points in the simulator are connected by a Green line
             for (int i = 2; i < vars.size(); i ++) {
-                if (i%2 == 0) {
+                if (i % 2 == 0) {
                     mpc_x_vals.push_back(vars[i]);
                 }
                 else {
@@ -162,7 +161,6 @@ int main() {
             msgJson["next_y"] = next_y_vals;
             
           
-// Check check
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
