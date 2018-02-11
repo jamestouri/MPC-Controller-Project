@@ -104,5 +104,67 @@ that's just a guess.
 One last note here: regardless of the IDE used, every submitted project must
 still be compilable with cmake and make./
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+## The Model 
+
+### Model State
+The model state will be represented based on the vector of {px, py, psi, v, cte, epsi}, where the data for these points come from the simulator that the car will be running in.  The simulator provides this data on the center of the road as waypoints. 
+
+### Model Equations and Cost
+The car is run upon these 5 equations for the Model State:
+```
+x1 = (x0 + v0 * CppAD::cos(psi0) * dt);
+y1 = (y0 + v0 * CppAD::sin(psi0) * dt);
+psi1 = (psi0 + v0 * delta0 / Lf * dt);
+v1 = (v0 + a0 * dt);
+cte1 = ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt));
+epsi1 = ((psi0 - psides0) + v0 * delta0 / Lf * dt);
+```
+The equations are also needed to provide an estimated state of a value of 100ms in the future. 
+
+The model cost was given through Udacity and used it for error states of cte, epsi, and velocity.
+
+Cost Model:
+
+```
+   // CTE, orientation error and ref-speed error
+        for (int i = 0; i < N; i++) {
+            fg[0] += CppAD::pow(vars[cte_start + i] - ref_cte, 2);
+            fg[0] += CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);
+            fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
+        }
+        
+        // Minimize the use of actuators.
+        for (int i = 0; i < N - 1; i++) {
+            fg[0] += CppAD::pow(vars[delta_start + i], 2);
+            fg[0] += CppAD::pow(vars[a_start + i], 2);
+        }
+        
+        // Minimize the value gap between sequential actuations.
+        for (int i = 0; i < N - 2; i++) {
+            fg[0] += 5000 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);
+            fg[0] += CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
+        }
+```
+
+### Model Speed, Time Step Length an d Elasped Duration
+
+I chose the model speed at a high of 25.  Working at higher speeds had the car drift off at the bridge, and sometimes at the first dirt road with clear unstability. 
+
+The N value is appointed at 10 and dt at 0.05. Various values were tested and these resulted in the best values at 20:1 ratio.
+
+### MPC Preprocessing
+
+The polynomial was created to fit into the waypoints and implements the transform matrix. The result of the polynomial fitting are coefficients which will serve to calculate the cross-track error CTE.
+
+### Latency 
+
+Being in a simulated program, previous projects didn't have a need for a dt value, however with an estimation of the vehicle's state of the 100ms into the future, the vehicle's stability changed based on the values given. 
+
+
+[](https://github.com/jamestouri/MPC-Controller-Project/blob/master/Screen%20Shot%202018-02-11%20at%2011.46.56%20AM.png)
+
+
+
+
+
+
