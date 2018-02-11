@@ -161,7 +161,7 @@ The polynomial was created to fit into the waypoints and implements the transfor
 Being in a simulated program, previous projects didn't have a need for a dt value, however with an estimation of the vehicle's state of the 100ms into the future, the vehicle's stability changed based on the values given. 
 
 
-[](https://github.com/jamestouri/MPC-Controller-Project/blob/master/Screen%20Shot%202018-02-11%20at%2011.46.56%20AM.png)
+![](https://github.com/jamestouri/MPC-Controller-Project/blob/master/Screen%20Shot%202018-02-11%20at%2011.46.56%20AM.png)
 
 
 
